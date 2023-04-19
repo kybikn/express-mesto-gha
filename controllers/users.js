@@ -76,7 +76,7 @@ const editProfile = (req, res) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   )
     .then((user) => {
       res.status(200).send(user);
@@ -103,7 +103,7 @@ const editAvatar = (req, res) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   )
     .then((user) => {
       res.status(200).send(user);

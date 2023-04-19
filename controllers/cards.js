@@ -3,6 +3,7 @@ const {
   ERROR_INCORRECT, //  некорректные данные
   ERROR_NOT_FOUND, // карточка не найдена
   ERROR_DEFAULT, // произошла ошибка
+  ERROR_INCORRECT_MESSAGE,
   ERROR_NOT_FOUND_CARD_MESSAGE,
   ERROR_DEFAULT_MESSAGE,
 } = require('../utils/constants');
@@ -80,7 +81,7 @@ const addCardLike = (req, res) => {
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: userId } }, // добавить _id в массив, если его там нет
-    { new: true }
+    { new: true },
   )
     .populate('owner')
     .populate('likes')
@@ -106,7 +107,7 @@ const deleteCardLike = (req, res) => {
     // req.params.cardId,
     cardId,
     { $pull: { likes: userId } }, // убрать _id из массива
-    { new: true }
+    { new: true },
   )
     .populate('owner')
     .populate('likes')
