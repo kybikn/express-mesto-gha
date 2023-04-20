@@ -69,8 +69,14 @@ const deleteCard = (req, res) => {
         res.send({ message: 'Карточка удалена' });
       }
     })
-    .catch(() => {
-      res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        res
+          .status(ERROR_INCORRECT)
+          .send({ message: ERROR_INCORRECT_MESSAGE });
+      } else {
+        res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
+      }
     });
 };
 
@@ -86,13 +92,19 @@ const addCardLike = (req, res) => {
     .populate('owner')
     .populate('likes')
     .then((card) => {
-      res.send(card);
+      if (!card) {
+        res
+          .status(ERROR_NOT_FOUND)
+          .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
+      } else {
+        res.send(card);
+      }
     })
     .catch((error) => {
       if (error.name === 'CastError') {
         res
-          .status(ERROR_NOT_FOUND)
-          .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
+          .status(ERROR_INCORRECT)
+          .send({ message: ERROR_INCORRECT_MESSAGE });
       } else {
         res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
       }
@@ -112,13 +124,19 @@ const deleteCardLike = (req, res) => {
     .populate('owner')
     .populate('likes')
     .then((card) => {
-      res.send(card);
+      if (!card) {
+        res
+          .status(ERROR_NOT_FOUND)
+          .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
+      } else {
+        res.send(card);
+      }
     })
     .catch((error) => {
       if (error.name === 'CastError') {
         res
-          .status(ERROR_NOT_FOUND)
-          .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
+          .status(ERROR_INCORRECT)
+          .send({ message: ERROR_INCORRECT_MESSAGE });
       } else {
         res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
       }
