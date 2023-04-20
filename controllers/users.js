@@ -85,14 +85,16 @@ const editProfile = (req, res) => {
     },
   )
     .then((user) => {
-      res.status(200).send(user);
-    })
-    .catch((error) => {
-      if (error.name === 'CastError') {
+      if (!user) {
         res
           .status(ERROR_NOT_FOUND)
           .send({ message: ERROR_NOT_FOUND_USER_MESSAGE });
-      } else if (error.name === 'ValidationError') {
+      } else {
+        res.status(200).send(user);
+      }
+    })
+    .catch((error) => {
+      if (error.name === 'CastError' || error.name === 'ValidationError') {
         res.status(ERROR_INCORRECT).send({ message: ERROR_INCORRECT_MESSAGE });
       } else {
         res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
@@ -112,14 +114,16 @@ const editAvatar = (req, res) => {
     },
   )
     .then((user) => {
-      res.status(200).send(user);
-    })
-    .catch((error) => {
-      if (error.name === 'CastError') {
+      if (!user) {
         res
           .status(ERROR_NOT_FOUND)
           .send({ message: ERROR_NOT_FOUND_USER_MESSAGE });
-      } else if (error.name === 'ValidationError') {
+      } else {
+        res.status(200).send(user);
+      }
+    })
+    .catch((error) => {
+      if (error.name === 'CastError' || error.name === 'ValidationError') {
         res.status(ERROR_INCORRECT).send({ message: ERROR_INCORRECT_MESSAGE });
       } else {
         res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });

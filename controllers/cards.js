@@ -44,13 +44,17 @@ const getCardById = (req, res) => {
   Card.findById(id)
     .populate('owner')
     .then((card) => {
-      res.send(card);
-    })
-    .catch((error) => {
-      if (error.name === 'CastError') {
+      if (!card) {
         res
           .status(ERROR_NOT_FOUND)
           .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
+      } else {
+        res.send(card);
+      }
+    })
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        res.status(ERROR_INCORRECT).send({ message: ERROR_INCORRECT_MESSAGE });
       } else {
         res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
       }
@@ -116,7 +120,6 @@ const deleteCardLike = (req, res) => {
   const userId = req.user._id;
 
   Card.findByIdAndUpdate(
-    // req.params.cardId,
     cardId,
     { $pull: { likes: userId } }, // убрать _id из массива
     { new: true },
