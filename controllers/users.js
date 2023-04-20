@@ -1,5 +1,3 @@
-const { ObjectId } = require('mongoose').Types;
-
 const User = require('../models/users');
 const {
   ERROR_INCORRECT, //  некорректные данные
@@ -37,13 +35,6 @@ const getUsers = (req, res) => {
 
 const getUserById = (req, res) => {
   const { id } = req.params;
-  const isValid = ObjectId.isValid(id);
-  if (!isValid) {
-    res
-      .status(ERROR_INCORRECT)
-      .send({ message: ERROR_INCORRECT_MESSAGE });
-    return;
-  }
   User.findById(id)
     .then((user) => {
       if (!user) {
@@ -54,8 +45,14 @@ const getUserById = (req, res) => {
         res.status(200).send(user);
       }
     })
-    .catch(() => {
-      res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        res
+          .status(ERROR_INCORRECT)
+          .send({ message: ERROR_INCORRECT_MESSAGE });
+      } else {
+        res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
+      }
     });
 };
 
