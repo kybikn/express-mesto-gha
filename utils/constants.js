@@ -1,3 +1,4 @@
+const SUCCESS = 200;
 const ERROR_INCORRECT = 400;
 const ERROR_NOT_FOUND = 404;
 const ERROR_DEFAULT = 500;
@@ -7,6 +8,7 @@ const ERROR_NOT_FOUND_CARD_MESSAGE = 'Карточка с указанным _id
 const ERROR_DEFAULT_MESSAGE = 'На сервере произошла ошибка';
 
 module.exports = {
+  SUCCESS,
   ERROR_INCORRECT,
   ERROR_NOT_FOUND,
   ERROR_DEFAULT,

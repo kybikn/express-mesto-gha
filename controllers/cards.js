@@ -1,8 +1,9 @@
 const Card = require('../models/cards');
 const {
-  ERROR_INCORRECT, //  некорректные данные
-  ERROR_NOT_FOUND, // карточка не найдена
-  ERROR_DEFAULT, // произошла ошибка
+  SUCCESS,
+  ERROR_INCORRECT,
+  ERROR_NOT_FOUND,
+  ERROR_DEFAULT,
   ERROR_INCORRECT_MESSAGE,
   ERROR_NOT_FOUND_CARD_MESSAGE,
   ERROR_DEFAULT_MESSAGE,
@@ -18,7 +19,7 @@ const createCard = (req, res) => {
     owner: _id,
   })
     .then((card) => card.populate('owner'))
-    .then((populatedCard) => res.status(200).send(populatedCard))
+    .then((populatedCard) => res.status(SUCCESS).send(populatedCard))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         res.status(ERROR_INCORRECT).send({ message: ERROR_INCORRECT_MESSAGE });
@@ -32,7 +33,7 @@ const getCards = (req, res) => {
   Card.find({})
     .populate('owner')
     .then((card) => {
-      res.send(card);
+      res.status(SUCCESS).send(card);
     })
     .catch(() => {
       res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
@@ -49,7 +50,7 @@ const getCardById = (req, res) => {
           .status(ERROR_NOT_FOUND)
           .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
       } else {
-        res.send(card);
+        res.status(SUCCESS).send(card);
       }
     })
     .catch((error) => {
@@ -70,7 +71,7 @@ const deleteCard = (req, res) => {
           .status(ERROR_NOT_FOUND)
           .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
       } else {
-        res.send({ message: 'Карточка удалена' });
+        res.status(SUCCESS).send({ message: 'Карточка удалена' });
       }
     })
     .catch((error) => {
@@ -101,7 +102,7 @@ const addCardLike = (req, res) => {
           .status(ERROR_NOT_FOUND)
           .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
       } else {
-        res.send(card);
+        res.status(SUCCESS).send(card);
       }
     })
     .catch((error) => {
@@ -132,7 +133,7 @@ const deleteCardLike = (req, res) => {
           .status(ERROR_NOT_FOUND)
           .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
       } else {
-        res.send(card);
+        res.status(SUCCESS).send(card);
       }
     })
     .catch((error) => {

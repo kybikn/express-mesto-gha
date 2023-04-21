@@ -1,8 +1,9 @@
 const User = require('../models/users');
 const {
-  ERROR_INCORRECT, //  некорректные данные
-  ERROR_NOT_FOUND, // пользователь не найден
-  ERROR_DEFAULT, // произошла ошибка
+  SUCCESS,
+  ERROR_INCORRECT,
+  ERROR_NOT_FOUND,
+  ERROR_DEFAULT,
   ERROR_INCORRECT_MESSAGE,
   ERROR_NOT_FOUND_USER_MESSAGE,
   ERROR_DEFAULT_MESSAGE,
@@ -12,7 +13,7 @@ const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => {
-      res.status(200).send(user);
+      res.status(SUCCESS).send(user);
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
@@ -26,7 +27,7 @@ const createUser = (req, res) => {
 const getUsers = (req, res) => {
   User.find({})
     .then((user) => {
-      res.status(200).send(user);
+      res.status(SUCCESS).send(user);
     })
     .catch(() => {
       res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
@@ -42,7 +43,7 @@ const getUserById = (req, res) => {
           .status(ERROR_NOT_FOUND)
           .send({ message: ERROR_NOT_FOUND_USER_MESSAGE });
       } else {
-        res.status(200).send(user);
+        res.status(SUCCESS).send(user);
       }
     })
     .catch((error) => {
@@ -65,7 +66,7 @@ const getMyProfile = (req, res) => {
           .status(ERROR_NOT_FOUND)
           .send({ message: ERROR_NOT_FOUND_USER_MESSAGE });
       } else {
-        res.status(200).send(user);
+        res.status(SUCCESS).send(user);
       }
     })
     .catch(() => {
@@ -90,7 +91,7 @@ const editProfile = (req, res) => {
           .status(ERROR_NOT_FOUND)
           .send({ message: ERROR_NOT_FOUND_USER_MESSAGE });
       } else {
-        res.status(200).send(user);
+        res.status(SUCCESS).send(user);
       }
     })
     .catch((error) => {
@@ -119,7 +120,7 @@ const editAvatar = (req, res) => {
           .status(ERROR_NOT_FOUND)
           .send({ message: ERROR_NOT_FOUND_USER_MESSAGE });
       } else {
-        res.status(200).send(user);
+        res.status(SUCCESS).send(user);
       }
     })
     .catch((error) => {
