@@ -4,14 +4,21 @@ const cardSchema = new mongoose.Schema({
   name: {
     type: String,
     minLength: 2,
-    maxLength: 30,
+    maxLength: 40,
     required: true,
   },
   link: {
-    // type: mongoose.Schema.Types.Url,
     type: String,
     minLength: 2,
+    maxLength: 500,
     required: true,
+    validate: {
+      validator: (link) => {
+        const urlRegex = /^(https:|http:|www\.)\S*/;
+        urlRegex.test(link);
+      },
+      message: 'Невалидная ссылка',
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
