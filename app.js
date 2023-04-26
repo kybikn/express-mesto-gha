@@ -3,9 +3,13 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const router = require('./routes/index');
+require('dotenv').config();
+const { errors } = require('celebrate');
 
-const { PORT = 3000 } = process.env;
+const router = require('./routes/index');
+const checkErrors = require('./middlewares/checkErrors');
+
+const { PORT } = process.env;
 
 const app = express();
 
@@ -23,13 +27,20 @@ app.use(limiter);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '644023a2df1d66f7a9883501',
-  };
-  next();
-});
-
 app.use(router);
+app.use(errors()); // обработчик ошибок celebrate
+app.use(checkErrors);
 
 app.listen(PORT);
+
+// app.use((err, req, res, next) => {
+//   const { statusCode = 500, message } = err;
+//   res
+//     .status(statusCode)
+//     .send({
+//       message: statusCode === 500
+//         ? 'На сервере произошла ошибка'
+//         : message,
+//     });
+//   next();
+// });
