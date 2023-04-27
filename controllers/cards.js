@@ -38,7 +38,7 @@ const getCardById = (req, res, next) => {
     .populate('owner')
     .then((card) => {
       if (!card) {
-        throw new NotFoundError({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_CARD_MESSAGE);
       } else {
         res.status(SUCCESS_CODE).send(card);
       }
@@ -52,10 +52,10 @@ const deleteCard = (req, res, next) => {
   Card.findById(id)
     .then((card) => {
       if (!card) {
-        throw new NotFoundError({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_CARD_MESSAGE);
       }
       if (card.owner._id.toString() !== userId) {
-        throw new ForbiddenError({ message: ERROR_FORBIDDEN_MESSAGE });
+        throw new ForbiddenError(ERROR_FORBIDDEN_MESSAGE);
       }
       Card.findByIdAndRemove(id)
         .then(() => {
@@ -77,7 +77,7 @@ const addCardLike = (req, res, next) => {
     .populate('likes')
     .then((card) => {
       if (!card) {
-        throw new NotFoundError({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_CARD_MESSAGE);
       } else {
         res.status(SUCCESS_CODE).send(card);
       }
@@ -97,7 +97,7 @@ const deleteCardLike = (req, res, next) => {
     .populate('likes')
     .then((card) => {
       if (!card) {
-        throw new NotFoundError({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_CARD_MESSAGE);
       } else {
         res.status(SUCCESS_CODE).send(card);
       }

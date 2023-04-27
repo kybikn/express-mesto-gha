@@ -14,6 +14,7 @@ const ERROR_UNAUTHORIZED_WRONG_MESSAGE = 'Неправильные почта и
 const ERROR_FORBIDDEN_MESSAGE = 'Удаление чужой карточки запрещено';
 const ERROR_NOT_FOUND_USER_MESSAGE = 'Пользователь по указанному _id не найден';
 const ERROR_NOT_FOUND_CARD_MESSAGE = 'Карточка с указанным _id не найдена';
+const ERROR_NOT_FOUND_PAGE_MESSAGE = 'Страница не найдена';
 const ERROR_CONFLICT_MESSAGE = 'Пользователь уже существует';
 const ERROR_DEFAULT_MESSAGE = 'На сервере произошла ошибка';
 const urlRegex = /^(https:|http:|www\.)\S*/;
@@ -35,6 +36,7 @@ module.exports = {
   ERROR_FORBIDDEN_MESSAGE,
   ERROR_NOT_FOUND_USER_MESSAGE,
   ERROR_NOT_FOUND_CARD_MESSAGE,
+  ERROR_NOT_FOUND_PAGE_MESSAGE,
   ERROR_CONFLICT_MESSAGE,
   ERROR_DEFAULT_MESSAGE,
   urlRegex,

@@ -2,7 +2,7 @@ const authRouter = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 
 const { createUser, login } = require('../controllers/users');
-const urlRegex = require('../utils/constants');
+const { urlRegex } = require('../utils/constants');
 
 authRouter.post('/signup', celebrate({
   body: Joi.object().keys({
@@ -11,7 +11,7 @@ authRouter.post('/signup', celebrate({
     password: Joi.string().required().min(6),
     name: Joi.string().min(2).max(40),
     about: Joi.string().min(2).max(200),
-    avatar: Joi.string().min(2).max(500).regex(urlRegex), // pattern(/^(https:|http:|www\.)\S*/),
+    avatar: Joi.string().min(2).max(500).pattern(urlRegex),
   }),
 }), createUser);
 

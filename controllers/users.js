@@ -37,6 +37,13 @@ const login = (req, res, next) => {
     .then((user) => {
       const jwtSecret = NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret';
       const token = jwt.sign({ _id: user._id }, jwtSecret, { expiresIn: '7d' });
+      // res
+      //   .cookie('token', token, {
+      //     maxAge: 3600000 * 24 * 7,
+      //     httpOnly: true,
+      //     sameSite: true,
+      //   })
+      //   .end(); // если у ответа нет тела, можно использовать метод end
       res.status(SUCCESS_CODE).send({ user, token });
     })
     .catch(next);
@@ -47,7 +54,7 @@ const getMyProfile = (req, res, next) => {
   User.findById(id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError({ message: ERROR_NOT_FOUND_USER_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_USER_MESSAGE);
       } else {
         res.status(SUCCESS_CODE).send(user);
       }
@@ -60,7 +67,7 @@ const getUserById = (req, res, next) => {
   User.findById(id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError({ message: ERROR_NOT_FOUND_USER_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_USER_MESSAGE);
       } else {
         res.status(SUCCESS_CODE).send(user);
       }
@@ -89,7 +96,7 @@ const editProfile = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        throw new NotFoundError({ message: ERROR_NOT_FOUND_USER_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_USER_MESSAGE);
       } else {
         res.status(SUCCESS_CODE).send(user);
       }
@@ -110,7 +117,7 @@ const editAvatar = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        throw new NotFoundError({ message: ERROR_NOT_FOUND_USER_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_USER_MESSAGE);
       } else {
         res.status(SUCCESS_CODE).send(user);
       }
