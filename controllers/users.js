@@ -35,16 +35,17 @@ const login = (req, res, next) => {
   User
     .findUserByCredentials({ email, password })
     .then((user) => {
+      const userData = JSON.parse(JSON.stringify(user)); // копируем объект
+      delete userData.password;
       const jwtSecret = NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret';
       const token = jwt.sign({ _id: user._id }, jwtSecret, { expiresIn: '7d' });
-      // res
-      //   .cookie('token', token, {
-      //     maxAge: 3600000 * 24 * 7,
-      //     httpOnly: true,
-      //     sameSite: true,
-      //   })
-      //   .end(); // если у ответа нет тела, можно использовать метод end
-      res.status(SUCCESS_CODE).send({ user, token });
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+          sameSite: true,
+        })
+        .status(SUCCESS_CODE).send({ user: userData });
     })
     .catch(next);
 };

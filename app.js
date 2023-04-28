@@ -5,11 +5,12 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const { errors } = require('celebrate');
+const cookieParser = require('cookie-parser');
 
 const router = require('./routes/index');
 const checkErrors = require('./middlewares/checkErrors');
 
-const { PORT } = process.env;
+const { PORT = 3000 } = process.env;
 
 const app = express();
 
@@ -22,6 +23,7 @@ const limiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
+app.use(cookieParser());
 app.use(helmet());
 app.use(limiter);
 app.use(bodyParser.json());
@@ -32,15 +34,3 @@ app.use(errors()); // обработчик ошибок celebrate
 app.use(checkErrors);
 
 app.listen(PORT);
-
-// app.use((err, req, res, next) => {
-//   const { statusCode = 500, message } = err;
-//   res
-//     .status(statusCode)
-//     .send({
-//       message: statusCode === 500
-//         ? 'На сервере произошла ошибка'
-//         : message,
-//     });
-//   next();
-// });
