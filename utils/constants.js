@@ -6,8 +6,7 @@ const ERROR_FORBIDDEN = 403;
 const ERROR_NOT_FOUND = 404;
 const ERROR_CONFLICT = 409;
 const ERROR_DEFAULT = 500;
-const SUCCESS_CODE_MESSAGE = 'Карточка успешно удалена';
-const CREATED_CODE_MESSAGE = 'Пользователь создан';
+const SUCCESS_MESSAGE = 'Карточка успешно удалена';
 const ERROR_BAD_REQUEST_MESSAGE = 'Некорректные данные';
 const ERROR_UNAUTHORIZED_MESSAGE = 'Необходима авторизация';
 const ERROR_UNAUTHORIZED_WRONG_MESSAGE = 'Неправильные почта или пароль';
@@ -28,8 +27,7 @@ module.exports = {
   ERROR_NOT_FOUND,
   ERROR_CONFLICT,
   ERROR_DEFAULT,
-  SUCCESS_CODE_MESSAGE,
-  CREATED_CODE_MESSAGE,
+  SUCCESS_MESSAGE,
   ERROR_BAD_REQUEST_MESSAGE,
   ERROR_UNAUTHORIZED_MESSAGE,
   ERROR_UNAUTHORIZED_WRONG_MESSAGE,

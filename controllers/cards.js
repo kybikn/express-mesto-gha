@@ -1,7 +1,7 @@
 const Card = require('../models/cards');
 const {
   SUCCESS_CODE,
-  SUCCESS_CODE_MESSAGE,
+  SUCCESS_MESSAGE,
   ERROR_FORBIDDEN_MESSAGE,
   ERROR_NOT_FOUND_CARD_MESSAGE,
 } = require('../utils/constants');
@@ -59,7 +59,7 @@ const deleteCard = (req, res, next) => {
       }
       Card.findByIdAndRemove(id)
         .then(() => {
-          res.status(SUCCESS_CODE).send({ message: SUCCESS_CODE_MESSAGE });
+          res.status(SUCCESS_CODE).send({ message: SUCCESS_MESSAGE });
         });
     })
     .catch(next);
