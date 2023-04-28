@@ -7,7 +7,6 @@ const NotFoundError = require('../errors/not-found-err');
 const {
   SUCCESS_CODE,
   CREATED_CODE,
-  CREATED_CODE_MESSAGE,
   ERROR_NOT_FOUND_USER_MESSAGE,
 } = require('../utils/constants');
 
@@ -22,8 +21,10 @@ const createUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then(() => {
-      res.status(CREATED_CODE).send({ message: CREATED_CODE_MESSAGE });
+    .then((user) => {
+      const userData = JSON.parse(JSON.stringify(user)); // копируем объект
+      delete userData.password;
+      res.status(CREATED_CODE).send({ user: userData });
     })
     .catch(next);
 };
