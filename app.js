@@ -1,9 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+require('dotenv').config();
+const { errors } = require('celebrate');
+const cookieParser = require('cookie-parser');
+
 const router = require('./routes/index');
+const checkErrors = require('./middlewares/checkErrors');
 
 const { PORT = 3000 } = process.env;
 
@@ -18,18 +22,14 @@ const limiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
+app.use(cookieParser());
 app.use(helmet());
 app.use(limiter);
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: '644023a2df1d66f7a9883501',
-  };
-  next();
-});
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(router);
+app.use(errors()); // обработчик ошибок celebrate
+app.use(checkErrors);
 
 app.listen(PORT);

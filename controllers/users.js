@@ -1,80 +1,91 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+require('dotenv').config();
+
 const User = require('../models/users');
+const NotFoundError = require('../errors/not-found-err');
 const {
-  SUCCESS,
-  ERROR_INCORRECT,
-  ERROR_NOT_FOUND,
-  ERROR_DEFAULT,
-  ERROR_INCORRECT_MESSAGE,
+  SUCCESS_CODE,
+  CREATED_CODE,
   ERROR_NOT_FOUND_USER_MESSAGE,
-  ERROR_DEFAULT_MESSAGE,
 } = require('../utils/constants');
 
-const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+const { NODE_ENV, JWT_SECRET } = process.env;
+
+// регистрация
+const createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
     .then((user) => {
-      res.status(SUCCESS).send(user);
+      const userData = JSON.parse(JSON.stringify(user)); // копируем объект
+      delete userData.password;
+      res.status(CREATED_CODE).send({ user: userData });
     })
-    .catch((error) => {
-      if (error.name === 'ValidationError') {
-        res.status(ERROR_INCORRECT).send({ message: ERROR_INCORRECT_MESSAGE });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
-      }
-    });
+    .catch(next);
 };
 
-const getUsers = (req, res) => {
-  User.find({})
+const login = (req, res, next) => {
+  const {
+    email, password,
+  } = req.body;
+  User
+    .findUserByCredentials({ email, password })
     .then((user) => {
-      res.status(SUCCESS).send(user);
+      const userData = JSON.parse(JSON.stringify(user)); // копируем объект
+      delete userData.password;
+      const jwtSecret = NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret';
+      const token = jwt.sign({ _id: user._id }, jwtSecret, { expiresIn: '7d' });
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+          sameSite: true,
+        })
+        .status(SUCCESS_CODE).send({ user: userData });
     })
-    .catch(() => {
-      res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
-    });
+    .catch(next);
 };
 
-const getUserById = (req, res) => {
-  const { id } = req.params;
-  User.findById(id)
-    .then((user) => {
-      if (!user) {
-        res
-          .status(ERROR_NOT_FOUND)
-          .send({ message: ERROR_NOT_FOUND_USER_MESSAGE });
-      } else {
-        res.status(SUCCESS).send(user);
-      }
-    })
-    .catch((error) => {
-      if (error.name === 'CastError') {
-        res
-          .status(ERROR_INCORRECT)
-          .send({ message: ERROR_INCORRECT_MESSAGE });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
-      }
-    });
-};
-
-const getMyProfile = (req, res) => {
+const getMyProfile = (req, res, next) => {
   const id = req.user._id;
   User.findById(id)
     .then((user) => {
       if (!user) {
-        res
-          .status(ERROR_NOT_FOUND)
-          .send({ message: ERROR_NOT_FOUND_USER_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_USER_MESSAGE);
       } else {
-        res.status(SUCCESS).send(user);
+        res.status(SUCCESS_CODE).send(user);
       }
     })
-    .catch(() => {
-      res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
-    });
+    .catch(next);
 };
 
-const editProfile = (req, res) => {
+const getUserById = (req, res, next) => {
+  const { id } = req.params;
+  User.findById(id)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError(ERROR_NOT_FOUND_USER_MESSAGE);
+      } else {
+        res.status(SUCCESS_CODE).send(user);
+      }
+    })
+    .catch(next);
+};
+
+const getUsers = (req, res, next) => {
+  User.find({})
+    .then((user) => {
+      res.status(SUCCESS_CODE).send(user);
+    })
+    .catch(next);
+};
+
+const editProfile = (req, res, next) => {
   const { name, about } = req.body;
   const id = req.user._id;
   User.findByIdAndUpdate(
@@ -87,23 +98,15 @@ const editProfile = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res
-          .status(ERROR_NOT_FOUND)
-          .send({ message: ERROR_NOT_FOUND_USER_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_USER_MESSAGE);
       } else {
-        res.status(SUCCESS).send(user);
+        res.status(SUCCESS_CODE).send(user);
       }
     })
-    .catch((error) => {
-      if (error.name === 'CastError' || error.name === 'ValidationError') {
-        res.status(ERROR_INCORRECT).send({ message: ERROR_INCORRECT_MESSAGE });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
-      }
-    });
+    .catch(next);
 };
 
-const editAvatar = (req, res) => {
+const editAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const id = req.user._id;
   User.findByIdAndUpdate(
@@ -116,27 +119,20 @@ const editAvatar = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res
-          .status(ERROR_NOT_FOUND)
-          .send({ message: ERROR_NOT_FOUND_USER_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_USER_MESSAGE);
       } else {
-        res.status(SUCCESS).send(user);
+        res.status(SUCCESS_CODE).send(user);
       }
     })
-    .catch((error) => {
-      if (error.name === 'CastError' || error.name === 'ValidationError') {
-        res.status(ERROR_INCORRECT).send({ message: ERROR_INCORRECT_MESSAGE });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
-      }
-    });
+    .catch(next);
 };
 
 module.exports = {
   createUser,
-  getUsers,
-  getUserById,
+  login,
   getMyProfile,
+  getUserById,
+  getUsers,
   editProfile,
   editAvatar,
 };

@@ -1,22 +1,30 @@
 const mongoose = require('mongoose');
+const {
+  urlRegex,
+} = require('../utils/constants');
 
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
     minLength: 2,
-    maxLength: 30,
+    maxLength: 40,
     required: true,
   },
   link: {
-    // type: mongoose.Schema.Types.Url,
     type: String,
     minLength: 2,
+    maxLength: 500,
     required: true,
+    validate: {
+      validator: (link) => {
+        urlRegex.test(link);
+      },
+      message: 'Невалидная ссылка',
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    required: true,
   },
   likes: [
     {
@@ -28,7 +36,6 @@ const cardSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    required: true,
   },
 });
 

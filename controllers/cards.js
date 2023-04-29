@@ -1,94 +1,73 @@
 const Card = require('../models/cards');
 const {
-  SUCCESS,
-  ERROR_INCORRECT,
-  ERROR_NOT_FOUND,
-  ERROR_DEFAULT,
-  ERROR_INCORRECT_MESSAGE,
+  SUCCESS_CODE,
+  SUCCESS_MESSAGE,
+  ERROR_FORBIDDEN_MESSAGE,
   ERROR_NOT_FOUND_CARD_MESSAGE,
-  ERROR_DEFAULT_MESSAGE,
 } = require('../utils/constants');
+const NotFoundError = require('../errors/not-found-err');
+const ForbiddenError = require('../errors/forbidden-err');
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const { _id } = req.user;
-
   Card.create({
     name,
     link,
     owner: _id,
   })
     .then((card) => card.populate('owner'))
-    .then((populatedCard) => res.status(SUCCESS).send(populatedCard))
-    .catch((error) => {
-      if (error.name === 'ValidationError') {
-        res.status(ERROR_INCORRECT).send({ message: ERROR_INCORRECT_MESSAGE });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
-      }
-    });
+    .then((populatedCard) => {
+      res.status(SUCCESS_CODE).send(populatedCard);
+    })
+    .catch(next);
 };
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .populate('owner')
     .then((card) => {
-      res.status(SUCCESS).send(card);
+      res.status(SUCCESS_CODE).send(card);
     })
-    .catch(() => {
-      res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
-    });
+    .catch(next);
 };
 
-const getCardById = (req, res) => {
+const getCardById = (req, res, next) => {
   const { id } = req.params;
   Card.findById(id)
     .populate('owner')
     .then((card) => {
       if (!card) {
-        res
-          .status(ERROR_NOT_FOUND)
-          .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_CARD_MESSAGE);
       } else {
-        res.status(SUCCESS).send(card);
+        res.status(SUCCESS_CODE).send(card);
       }
     })
-    .catch((error) => {
-      if (error.name === 'CastError') {
-        res.status(ERROR_INCORRECT).send({ message: ERROR_INCORRECT_MESSAGE });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
-      }
-    });
+    .catch(next);
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   const { id } = req.params;
-  Card.findByIdAndRemove(id)
+  const userId = req.user._id;
+  Card.findById(id)
     .then((card) => {
       if (!card) {
-        res
-          .status(ERROR_NOT_FOUND)
-          .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
-      } else {
-        res.status(SUCCESS).send({ message: 'Карточка удалена' });
+        throw new NotFoundError(ERROR_NOT_FOUND_CARD_MESSAGE);
       }
+      if (card.owner._id.toString() !== userId) {
+        throw new ForbiddenError(ERROR_FORBIDDEN_MESSAGE);
+      }
+      Card.findByIdAndRemove(id)
+        .then(() => {
+          res.status(SUCCESS_CODE).send({ message: SUCCESS_MESSAGE });
+        });
     })
-    .catch((error) => {
-      if (error.name === 'CastError') {
-        res
-          .status(ERROR_INCORRECT)
-          .send({ message: ERROR_INCORRECT_MESSAGE });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
-      }
-    });
+    .catch(next);
 };
 
-const addCardLike = (req, res) => {
+const addCardLike = (req, res, next) => {
   const cardId = req.params.id;
   const userId = req.user._id;
-
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: userId } }, // добавить _id в массив, если его там нет
@@ -98,28 +77,17 @@ const addCardLike = (req, res) => {
     .populate('likes')
     .then((card) => {
       if (!card) {
-        res
-          .status(ERROR_NOT_FOUND)
-          .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_CARD_MESSAGE);
       } else {
-        res.status(SUCCESS).send(card);
+        res.status(SUCCESS_CODE).send(card);
       }
     })
-    .catch((error) => {
-      if (error.name === 'CastError') {
-        res
-          .status(ERROR_INCORRECT)
-          .send({ message: ERROR_INCORRECT_MESSAGE });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
-      }
-    });
+    .catch(next);
 };
 
-const deleteCardLike = (req, res) => {
+const deleteCardLike = (req, res, next) => {
   const cardId = req.params.id;
   const userId = req.user._id;
-
   Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: userId } }, // убрать _id из массива
@@ -129,22 +97,12 @@ const deleteCardLike = (req, res) => {
     .populate('likes')
     .then((card) => {
       if (!card) {
-        res
-          .status(ERROR_NOT_FOUND)
-          .send({ message: ERROR_NOT_FOUND_CARD_MESSAGE });
+        throw new NotFoundError(ERROR_NOT_FOUND_CARD_MESSAGE);
       } else {
-        res.status(SUCCESS).send(card);
+        res.status(SUCCESS_CODE).send(card);
       }
     })
-    .catch((error) => {
-      if (error.name === 'CastError') {
-        res
-          .status(ERROR_INCORRECT)
-          .send({ message: ERROR_INCORRECT_MESSAGE });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
-      }
-    });
+    .catch(next);
 };
 
 module.exports = {
