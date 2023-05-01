@@ -2,14 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-require('dotenv').config();
 const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
+const config = require('./config');
 
 const router = require('./routes/index');
 const checkErrors = require('./middlewares/checkErrors');
 
-const { PORT = 3000 } = process.env;
+const { PORT } = config;
 
 const app = express();
 
