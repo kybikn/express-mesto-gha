@@ -1,6 +1,7 @@
 const Card = require('../models/cards');
 const {
   SUCCESS_CODE,
+  CREATED_CODE,
   SUCCESS_MESSAGE,
   ERROR_FORBIDDEN_MESSAGE,
   ERROR_NOT_FOUND_CARD_MESSAGE,
@@ -18,7 +19,7 @@ const createCard = (req, res, next) => {
   })
     .then((card) => card.populate('owner'))
     .then((populatedCard) => {
-      res.status(SUCCESS_CODE).send(populatedCard);
+      res.status(CREATED_CODE).send(populatedCard);
     })
     .catch(next);
 };
@@ -26,6 +27,7 @@ const createCard = (req, res, next) => {
 const getCards = (req, res, next) => {
   Card.find({})
     .populate('owner')
+    .populate('likes')
     .then((card) => {
       res.status(SUCCESS_CODE).send(card);
     })
@@ -57,10 +59,11 @@ const deleteCard = (req, res, next) => {
       if (card.owner._id.toString() !== userId) {
         throw new ForbiddenError(ERROR_FORBIDDEN_MESSAGE);
       }
-      Card.findByIdAndRemove(id)
+      card.deleteOne()
         .then(() => {
           res.status(SUCCESS_CODE).send({ message: SUCCESS_MESSAGE });
-        });
+        })
+        .catch(next);
     })
     .catch(next);
 };
