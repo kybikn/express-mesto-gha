@@ -13,7 +13,6 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     minLength: 2,
-    maxLength: 500,
     required: true,
     validate: {
       validator: (link) => {
@@ -25,6 +24,7 @@ const cardSchema = new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
+    required: true,
   },
   likes: [
     {

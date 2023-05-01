@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-
 const UnauthorizedError = require('../errors/unauthorized-err');
 const {
   ERROR_UNAUTHORIZED_WRONG_MESSAGE,
@@ -25,7 +24,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     minLength: 2,
-    maxLength: 500,
     validate: {
       validator: (link) => {
         urlRegex.test(link);
@@ -36,7 +34,6 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     minLength: 3,
-    maxLength: 40,
     unique: true,
     required: true,
     validate: {
@@ -46,7 +43,6 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    minLength: 6,
     select: false,
     required: true,
   },
