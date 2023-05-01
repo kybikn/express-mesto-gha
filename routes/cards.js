@@ -11,7 +11,6 @@ const {
   addCardLike,
   deleteCardLike,
 } = require('../controllers/cards');
-const { urlRegex } = require('../utils/constants');
 
 cardsRouter.post('/', celebrate({
   body: Joi.object().keys({
