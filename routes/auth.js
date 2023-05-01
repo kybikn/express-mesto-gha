@@ -1,25 +1,23 @@
 const authRouter = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 
+const validationRules = require('../utils/validationRules');
 const { createUser, login } = require('../controllers/users');
-const { urlRegex } = require('../utils/constants');
 
 authRouter.post('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email().min(3)
-      .max(40),
-    password: Joi.string().required().min(6),
-    name: Joi.string().min(2).max(40),
-    about: Joi.string().min(2).max(200),
-    avatar: Joi.string().min(2).max(500).pattern(urlRegex),
+    email: validationRules.email,
+    password: validationRules.password,
+    name: validationRules.nameSignUp,
+    about: validationRules.aboutSignUp,
+    avatar: validationRules.avatar,
   }),
 }), createUser);
 
 authRouter.post('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email().min(3)
-      .max(40),
-    password: Joi.string().required().min(6),
+    email: validationRules.email,
+    password: validationRules.password,
   }),
 }), login);
 

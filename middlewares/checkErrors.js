@@ -1,3 +1,6 @@
+const mongoose = require('mongoose');
+
+const { CastError, ValidationError } = mongoose.Error;
 const {
   ERROR_BAD_REQUEST,
   ERROR_CONFLICT,
@@ -6,18 +9,13 @@ const {
   ERROR_CONFLICT_MESSAGE,
   ERROR_DEFAULT_MESSAGE,
 } = require('../utils/constants');
-const NotFoundError = require('../errors/not-found-err');
-const UnauthorizedError = require('../errors/unauthorized-err');
-const ForbiddenError = require('../errors/forbidden-err');
 
 module.exports = (error, req, res, next) => {
-  if (error.code === 11000) {
+  if (error instanceof mongoose.Error && error.code === 11000) {
     res.status(ERROR_CONFLICT).send({ message: ERROR_CONFLICT_MESSAGE });
-  } else if (error instanceof NotFoundError
-    || error instanceof UnauthorizedError
-    || error instanceof ForbiddenError) {
+  } else if (error.statusCode) {
     res.status(error.statusCode).send({ message: error.message });
-  } else if (error.name === 'CastError' || error.name === 'ValidationError') {
+  } else if (error instanceof CastError || error instanceof ValidationError) {
     res.status(ERROR_BAD_REQUEST).send({ message: ERROR_BAD_REQUEST_MESSAGE });
   } else {
     res.status(ERROR_DEFAULT).send({ message: ERROR_DEFAULT_MESSAGE });
