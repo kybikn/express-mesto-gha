@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-require('dotenv').config();
+const config = require('../config');
 
 const User = require('../models/users');
 const NotFoundError = require('../errors/not-found-err');
@@ -10,7 +10,7 @@ const {
   ERROR_NOT_FOUND_USER_MESSAGE,
 } = require('../utils/constants');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { NODE_ENV, JWT_SECRET } = config;
 
 // регистрация
 const createUser = (req, res, next) => {
@@ -51,8 +51,7 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
-const getMyProfile = (req, res, next) => {
-  const id = req.user._id;
+const getUser = (id, req, res, next) => {
   User.findById(id)
     .then((user) => {
       if (!user) {
@@ -64,17 +63,14 @@ const getMyProfile = (req, res, next) => {
     .catch(next);
 };
 
+const getMyProfile = (req, res, next) => {
+  const id = req.user._id;
+  getUser(id, req, res, next);
+};
+
 const getUserById = (req, res, next) => {
   const { id } = req.params;
-  User.findById(id)
-    .then((user) => {
-      if (!user) {
-        throw new NotFoundError(ERROR_NOT_FOUND_USER_MESSAGE);
-      } else {
-        res.status(SUCCESS_CODE).send(user);
-      }
-    })
-    .catch(next);
+  getUser(id, req, res, next);
 };
 
 const getUsers = (req, res, next) => {
@@ -85,12 +81,11 @@ const getUsers = (req, res, next) => {
     .catch(next);
 };
 
-const editProfile = (req, res, next) => {
-  const { name, about } = req.body;
+const editUser = (data, req, res, next) => {
   const id = req.user._id;
   User.findByIdAndUpdate(
     id,
-    { name, about },
+    data,
     {
       new: true,
       runValidators: true,
@@ -106,25 +101,16 @@ const editProfile = (req, res, next) => {
     .catch(next);
 };
 
+const editProfile = (req, res, next) => {
+  const { name, about } = req.body;
+  const data = { name, about };
+  editUser(data, req, res, next);
+};
+
 const editAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  const id = req.user._id;
-  User.findByIdAndUpdate(
-    id,
-    { avatar },
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
-    .then((user) => {
-      if (!user) {
-        throw new NotFoundError(ERROR_NOT_FOUND_USER_MESSAGE);
-      } else {
-        res.status(SUCCESS_CODE).send(user);
-      }
-    })
-    .catch(next);
+  const data = { avatar };
+  editUser(data, req, res, next);
 };
 
 module.exports = {
