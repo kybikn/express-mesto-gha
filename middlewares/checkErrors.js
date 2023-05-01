@@ -11,7 +11,7 @@ const {
 } = require('../utils/constants');
 
 module.exports = (error, req, res, next) => {
-  if (error instanceof mongoose.Error && error.code === 11000) {
+  if (error.code === 11000) {
     res.status(ERROR_CONFLICT).send({ message: ERROR_CONFLICT_MESSAGE });
   } else if (error.statusCode) {
     res.status(error.statusCode).send({ message: error.message });

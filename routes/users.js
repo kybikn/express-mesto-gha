@@ -13,14 +13,12 @@ const {
 
 usersRouter.get('/me', getMyProfile); // возвращает собсвенный профиль пользователя
 
-// usersRouter.get('/:id', celebrate({
-//   params: Joi.object().keys({
-//     // нужно ли прописывать required для id, ведь без id запрос сюда и не придет ?
-//     id: validationRules.id,
-//   }),
-// }), getUserById); // возвращает пользователя по _id
-
-usersRouter.get('/:id', getUserById); // возвращает пользователя по _id
+usersRouter.get('/:id', celebrate({
+  params: Joi.object().keys({
+    // нужно ли прописывать required для id, ведь без id запрос сюда и не придет ?
+    id: validationRules.id,
+  }),
+}), getUserById); // возвращает пользователя по _id
 
 usersRouter.get('/', getUsers); // возвращает всех пользователей
 
