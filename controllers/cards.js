@@ -26,8 +26,7 @@ const createCard = (req, res, next) => {
 
 const getCards = (req, res, next) => {
   Card.find({})
-    .populate('owner')
-    .populate('likes')
+    .populate(['owner', 'likes'])
     .then((card) => {
       res.status(SUCCESS_CODE).send(card);
     })
@@ -68,16 +67,16 @@ const deleteCard = (req, res, next) => {
     .catch(next);
 };
 
-const addCardLike = (req, res, next) => {
+const editCardLike = (action, req, res, next) => {
   const cardId = req.params.id;
   const userId = req.user._id;
+  const mongooseAction = action === 'add' ? '$addToSet' : '$pull';
   Card.findByIdAndUpdate(
     cardId,
-    { $addToSet: { likes: userId } }, // добавить _id в массив, если его там нет
+    { [mongooseAction]: { likes: userId } },
     { new: true },
   )
-    .populate('owner')
-    .populate('likes')
+    .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
         throw new NotFoundError(ERROR_NOT_FOUND_CARD_MESSAGE);
@@ -88,24 +87,14 @@ const addCardLike = (req, res, next) => {
     .catch(next);
 };
 
+const addCardLike = (req, res, next) => {
+  const action = 'add';
+  editCardLike(action, req, res, next);
+};
+
 const deleteCardLike = (req, res, next) => {
-  const cardId = req.params.id;
-  const userId = req.user._id;
-  Card.findByIdAndUpdate(
-    cardId,
-    { $pull: { likes: userId } }, // убрать _id из массива
-    { new: true },
-  )
-    .populate('owner')
-    .populate('likes')
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundError(ERROR_NOT_FOUND_CARD_MESSAGE);
-      } else {
-        res.status(SUCCESS_CODE).send(card);
-      }
-    })
-    .catch(next);
+  const action = 'delete';
+  editCardLike(action, req, res, next);
 };
 
 module.exports = {
