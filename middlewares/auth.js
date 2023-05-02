@@ -12,6 +12,7 @@ module.exports = (req, res, next) => {
   const token = req.cookies.jwt;
   if (!token) {
     next(new UnauthorizedError(ERROR_UNAUTHORIZED_MESSAGE));
+    return;
   }
   let payload;
   const jwtSecret = NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret';
@@ -19,6 +20,7 @@ module.exports = (req, res, next) => {
     payload = jwt.verify(token, jwtSecret);
   } catch (err) {
     next(new UnauthorizedError(ERROR_UNAUTHORIZED_MESSAGE));
+    return;
   }
   req.user = payload; // записываем пейлоуд в объект запроса
   next(); // пропускаем запрос дальше

@@ -10,7 +10,7 @@ authRouter.post('/signup', celebrate({
     password: validationRules.password,
     name: validationRules.nameSignUp,
     about: validationRules.aboutSignUp,
-    avatar: validationRules.avatar,
+    avatar: validationRules.avatarSignUp,
   }),
 }), createUser);
 
