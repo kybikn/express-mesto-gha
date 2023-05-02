@@ -7,10 +7,11 @@ const validationRules = {
   about: Joi.string().required().min(2).max(30),
   nameSignUp: Joi.string().min(2).max(40),
   aboutSignUp: Joi.string().min(2).max(30),
-  avatar: Joi.string().min(2).pattern(urlRegex),
-  email: Joi.string().required().email().min(3),
+  avatar: Joi.string().required().pattern(urlRegex),
+  avatarSignUp: Joi.string().pattern(urlRegex),
+  email: Joi.string().required().email(),
   password: Joi.string().required().min(6),
-  link: Joi.string().required().min(2).pattern(urlRegex),
+  link: Joi.string().required().pattern(urlRegex),
 };
 
 module.exports = validationRules;
